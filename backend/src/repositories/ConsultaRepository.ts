@@ -8,14 +8,13 @@ export class ConsultaRepository {
     }
 
     async listarTodasConsultas(pagina?: number, limite?: number) {
-       const existePaginacao = pagina! && limite!
-        if (!existePaginacao) return await prisma.consulta.findMany()
-        const consultas = await prisma.consulta.findMany({
+        const existePaginacao = pagina! && limite!
+        if (!existePaginacao) return await this.prisma.consulta.findMany()
+        const consultas = await this.prisma.consulta.findMany({
             skip: (pagina - 1) * limite,
             take: limite
         })
-
-        const total = await prisma.consulta.count();
+        const total = await this.prisma.consulta.count();
         const totalPaginas = Math.ceil(total / limite)
         return {
             consultas,
@@ -25,7 +24,7 @@ export class ConsultaRepository {
     }
 
     async buscarConsultaId(idConsulta: number) {
-        return await prisma.consulta.findUnique({
+        return await this.prisma.consulta.findUnique({
             where: { id: idConsulta }
         });
     }
@@ -43,14 +42,14 @@ export class ConsultaRepository {
     }
 
     async atualizarConsulta(idConsulta: number, dadosParaAtualizar: Omit<Consulta, "id">) {
-        return await prisma.consulta.update({
+        return await this.prisma.consulta.update({
             where: { id: idConsulta },
             data: { ...dadosParaAtualizar }
         });
     }
 
     async deletarConsulta(idConsulta: number) {
-        return await prisma.consulta.delete({
+        return await this.prisma.consulta.delete({
             where: { id: idConsulta }
         });
     }

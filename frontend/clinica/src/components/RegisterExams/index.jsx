@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 
 //modal
 import Modal from '../Modal'
+import apiClient from '../../api/api'
 
 const RegisterExams = () => {
 
@@ -27,7 +28,7 @@ const RegisterExams = () => {
     useEffect(() => {
         const fetchPatients = async () => {
             try {
-                const response = await axios.get("http://localhost:3000/patients")
+                const response = await apiClient.get("/paciente")
                 setPatients(response.data)
             } catch (error) {
                 console.error("Erro ao obter dados dos pacientes", error)
@@ -47,7 +48,7 @@ const RegisterExams = () => {
 
     const filteredPatients = patients.filter(
         (patient) =>
-            patient.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            patient.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
             patient.id.toString().includes(searchTerm)
     )
 
@@ -99,7 +100,7 @@ const RegisterExams = () => {
                 ...formData
             }
 
-            await axios.post("http://localhost:3000/exams", dataToSave)
+            await apiClient.post("/exames", dataToSave)
 
             toast.success("Exame cadastrado com sucesso!", {
                 autoClose: 2000,
@@ -184,7 +185,7 @@ const RegisterExams = () => {
                                     <strong>Registro:</strong> {patient.id}
                                 </p>
                                 <p className='text-sm'>
-                                    <strong>Nome:</strong> {patient.fullName}
+                                    <strong>Nome:</strong> {patient.nome}
                                 </p>
 
                                 <p className='text-sm'>
@@ -214,7 +215,7 @@ const RegisterExams = () => {
                         <>
                             {/* Título */}
                             <h2 className='text-lg font-bold mb-4 text-cyan-700'>
-                                Cadastrar exame para {selectedPatient.fullName}
+                                Cadastrar exame para {selectedPatient.nome}
                             </h2>
 
                             {/* Dados básicos */}

@@ -53,7 +53,10 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Usuario: 'Usuario',
   Exame: 'Exame',
-  Token: 'Token'
+  Token: 'Token',
+  Prontuario: 'Prontuario',
+  Consulta: 'Consulta',
+  Paciente: 'Paciente'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -89,7 +92,8 @@ export const ExameScalarFieldEnum = {
   valor: 'valor',
   descricao: 'descricao',
   resultado: 'resultado',
-  data_exame: 'data_exame'
+  data_exame: 'data_exame',
+  pacienteId: 'pacienteId'
 } as const
 
 export type ExameScalarFieldEnum = (typeof ExameScalarFieldEnum)[keyof typeof ExameScalarFieldEnum]
@@ -105,6 +109,60 @@ export const TokenScalarFieldEnum = {
 } as const
 
 export type TokenScalarFieldEnum = (typeof TokenScalarFieldEnum)[keyof typeof TokenScalarFieldEnum]
+
+
+export const ProntuarioScalarFieldEnum = {
+  id: 'id',
+  descricao: 'descricao',
+  data: 'data',
+  medico_responsavel_id: 'medico_responsavel_id',
+  paciente_id: 'paciente_id'
+} as const
+
+export type ProntuarioScalarFieldEnum = (typeof ProntuarioScalarFieldEnum)[keyof typeof ProntuarioScalarFieldEnum]
+
+
+export const ConsultaScalarFieldEnum = {
+  id: 'id',
+  motivo: 'motivo',
+  data_consulta: 'data_consulta',
+  observacoes: 'observacoes',
+  medico_responsavel_id: 'medico_responsavel_id',
+  paciente_id: 'paciente_id'
+} as const
+
+export type ConsultaScalarFieldEnum = (typeof ConsultaScalarFieldEnum)[keyof typeof ConsultaScalarFieldEnum]
+
+
+export const PacienteScalarFieldEnum = {
+  id: 'id',
+  nome: 'nome',
+  sexo: 'sexo',
+  data_nascimento: 'data_nascimento',
+  cpf: 'cpf',
+  rg: 'rg',
+  estado_civil: 'estado_civil',
+  telefone: 'telefone',
+  email: 'email',
+  naturalidade: 'naturalidade',
+  contato_emergencia: 'contato_emergencia',
+  alergias: 'alergias',
+  cuidados_especiais: 'cuidados_especiais',
+  convenio: 'convenio',
+  numero_convenio: 'numero_convenio',
+  validade_convenio: 'validade_convenio',
+  cep: 'cep',
+  cidade: 'cidade',
+  estado: 'estado',
+  rua: 'rua',
+  numero: 'numero',
+  complemento: 'complemento',
+  bairro: 'bairro',
+  referencia: 'referencia',
+  responsavel: 'responsavel'
+} as const
+
+export type PacienteScalarFieldEnum = (typeof PacienteScalarFieldEnum)[keyof typeof PacienteScalarFieldEnum]
 
 
 export const SortOrder = {

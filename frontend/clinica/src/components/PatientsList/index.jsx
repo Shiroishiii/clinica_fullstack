@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { FaUserAlt } from 'react-icons/fa'
 import { Link } from "react-router"
+import apiClient from "../../api/api"
 
 const PatientsList = () => {
     const [patients, setPatients] = useState([])
@@ -23,7 +24,7 @@ const PatientsList = () => {
     useEffect(() => {
         const fetchPatients = async () => {
             try {
-                const response = await axios.get("http://localhost:3000/patients")
+                const response = await apiClient.get("/paciente")
                 if (!response) return
 
                 const patientsData = response.data

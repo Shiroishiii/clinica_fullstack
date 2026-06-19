@@ -13,11 +13,14 @@ class ConsultaController {
 
             const consultas = await this.service.listarTodasConsultas(pagina, limite);
             return res.status(200).json(consultas)
-        } catch (error) {
-            console.log(error)
-            return res.status(404).json({
-                error
-            })
+        } catch (error: any) {
+            console.error('ERRO COMPLETO:', error);
+
+            return res.status(500).json({
+                message: error?.message,
+                code: error?.code,
+                name: error?.name
+            });
         }
     }
 

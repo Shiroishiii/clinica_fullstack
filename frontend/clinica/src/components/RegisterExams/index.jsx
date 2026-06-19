@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import { toast } from 'react-toastify'
 
-//modal
 import Modal from '../Modal'
 import apiClient from '../../api/api'
 
 const RegisterExams = () => {
-
     const [searchTerm, setSearchTerm] = useState("")
     const [patients, setPatients] = useState([])
     const [selectedPatient, setSelectedPatient] = useState(null)
@@ -15,15 +12,13 @@ const RegisterExams = () => {
     const [isSaving, setIsSaving] = useState(false)
 
     const [formData, setFormData] = useState({
-        name: "",
-        date: "",
-        time: "",
-        type: "",
-        documentUrl: "",
-        results: ""
+        tipo_exame: "",
+        valor: "",
+        descricao: "",
+        resultado: "",
+        data: "",
+        hora: "",
     })
-
-    // busca pacientes
 
     useEffect(() => {
         const fetchPatients = async () => {
@@ -37,14 +32,7 @@ const RegisterExams = () => {
         fetchPatients()
     }, [])
 
-
-    // funções auxiliares
-
-    //controle do campo de filtro
-
     const handleSearchChange = (e) => setSearchTerm(e.target.value)
-
-    //filtro dos pacientes
 
     const filteredPatients = patients.filter(
         (patient) =>
@@ -52,41 +40,31 @@ const RegisterExams = () => {
             patient.id.toString().includes(searchTerm)
     )
 
-    //seleciona o paciente  e abre modal
-
     const handleSelectPatient = (patient) => {
         setSelectedPatient(patient)
         setIsModalOpen(true)
     }
-
-    //fecha modal e reseta o valor do paciente selecionado
 
     const handleCloseModal = () => {
         setIsModalOpen(false)
         setSelectedPatient(null)
     }
 
-    //Controla os campos do estado formData dinamicamente
-
     const handleInputChange = (e) => {
         const { name, value } = e.target
         setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
-    //reseta o form
-
     const resetForm = () => {
         setFormData({
-            name: "",
-            date: "",
-            time: "",
-            type: "",
-            documentUrl: "",
-            results: ""
+            tipo_exame: "",
+            valor: "",
+            descricao: "",
+            resultado: "",
+            data: "",
+            hora: "",
         })
     }
-
-    //envia os dados
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -95,12 +73,15 @@ const RegisterExams = () => {
         try {
             setIsSaving(true)
 
-            const dataToSave = {
-                patientId: selectedPatient.id,
-                ...formData
-            }
-
-            await apiClient.post("/exames", dataToSave)
+            await apiClient.post("/exames", {
+                tipo_exame: formData.tipo_exame,
+                valor: Number(formData.valor),
+                descricao: formData.descricao,
+                resultado: formData.resultado,
+                data: formData.data,
+                hora: formData.hora,
+                pacienteId: selectedPatient.id,
+            })
 
             toast.success("Exame cadastrado com sucesso!", {
                 autoClose: 2000,
@@ -109,54 +90,19 @@ const RegisterExams = () => {
 
             resetForm()
             handleCloseModal()
-
         } catch (error) {
-            console.error("Erro ao cadastrar exame!")
+            console.error("Erro ao cadastrar exame!", error)
             toast.error("Erro ao cadastrar exame!", {
                 autoClose: 2000,
                 hideProgressBar: true
             })
+        } finally {
+            setIsSaving(false)
         }
     }
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-
-        if (!file) return;
-
-        // Validar tipo
-        const allowedTypes = [
-            "application/pdf",
-            "image/png",
-            "image/jpeg"
-        ];
-
-        if (!allowedTypes.includes(file.type)) {
-            alert("Apenas PDF, PNG ou JPG são permitidos.");
-            e.target.value = "";
-            return;
-        }
-
-        // Validar tamanho (5MB)
-        const maxSize = 5 * 1024 * 1024;
-
-        if (file.size > maxSize) {
-            alert("O arquivo deve ter no máximo 5MB.");
-            e.target.value = "";
-            return;
-        }
-
-        setFormData({
-            ...formData,
-            documentUrl: file
-        });
-    };
-
-
     return (
         <section className='p-6 text-gray-800'>
-            {/* campo de busca */}
-
             <div className='mb-6'>
                 <label className='block text-sm font-semibold mb-2'>
                     Buscar paciente para cadastrar o exame
@@ -168,198 +114,149 @@ const RegisterExams = () => {
                     placeholder='Digite o nome ou o registro do paciente'
                     className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
                 />
-
             </div>
 
-            {/* Lista de pacientes */}
-
             <ul className='space-y-3'>
-                {
-                    filteredPatients.map((patient) => (
-                        <li
-                            key={patient.id}
-                            className='p-4 border rounded-lg shadow-sm flex justify-between items-center hover:bg-gray-50 transition'
+                {filteredPatients.map((patient) => (
+                    <li
+                        key={patient.id}
+                        className='p-4 border rounded-lg shadow-sm flex justify-between items-center hover:bg-gray-50 transition'
+                    >
+                        <div>
+                            <p className='text-sm'><strong>Registro:</strong> {patient.id}</p>
+                            <p className='text-sm'><strong>Nome:</strong> {patient.nome}</p>
+                            <p className='text-sm'><strong>Convênio:</strong> {patient.convenio || "-"}</p>
+                        </div>
+
+                        <button
+                            onClick={() => handleSelectPatient(patient)}
+                            className='bg-cyan-700 text-white px-3 py-2 rounded-lg hover:bg-cyan-600 cursor-pointer'
                         >
-                            <div>
-                                <p className='text-sm'>
-                                    <strong>Registro:</strong> {patient.id}
-                                </p>
-                                <p className='text-sm'>
-                                    <strong>Nome:</strong> {patient.nome}
-                                </p>
-
-                                <p className='text-sm'>
-                                    <strong>Convênio:</strong> {patient.healthInsurance}
-                                </p>
-
-                            </div>
-
-                            <button
-                                onClick={() => handleSelectPatient(patient)}
-                                className='bg-cyan-700 text-white px-3 py-2 rounded-lg hover:bg-cyan-600 cursor-pointer'
-                            >
-                                Selecionar
-                            </button>
-
-                        </li>
-                    ))
-                }
+                            Selecionar
+                        </button>
+                    </li>
+                ))}
             </ul>
 
-
-            {/* Modal de cadastro de exame */}
-
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-                {
-                    selectedPatient && (
-                        <>
-                            {/* Título */}
-                            <h2 className='text-lg font-bold mb-4 text-cyan-700'>
-                                Cadastrar exame para {selectedPatient.nome}
-                            </h2>
+                {selectedPatient && (
+                    <>
+                        <h2 className='text-lg font-bold mb-4 text-cyan-700'>
+                            Cadastrar exame para {selectedPatient.nome}
+                        </h2>
 
-                            {/* Dados básicos */}
-                            <div className='mb-4 text-sm text-gray-700'>
-                                <p>
-                                    <strong>Email:</strong> {selectedPatient.email}
-                                </p>
-                                <p>
-                                    <strong>Telefone:</strong> {selectedPatient.phone}
-                                </p>
-                            </div>
+                        <div className='mb-4 text-sm text-gray-700'>
+                            <p><strong>Email:</strong> {selectedPatient.email}</p>
+                            <p><strong>Telefone:</strong> {selectedPatient.telefone}</p>
+                        </div>
 
-                            <form onSubmit={handleSubmit} className='space-y-4'>
-                                <div className='grid grid-cols-2 gap-4'>
-                                    {/* data */}
-                                    <div>
-                                        <label htmlFor='date' className='block text-sm font-medium mb-1'>
-                                            Data
-                                        </label>
-
-                                        <input
-                                            type='date'
-                                            name='date'
-                                            id='date'
-                                            value={formData.date}
-                                            onChange={handleInputChange}
-                                            required
-                                            className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
-                                        />
-
-                                    </div>
-                                    {/* Hora */}
-                                    <div>
-                                        <label htmlFor='time' className='block text-sm font-medium mb-1'>
-                                            Horário
-                                        </label>
-
-                                        <input
-                                            type='time'
-                                            name='time'
-                                            id='time'
-                                            value={formData.time}
-                                            onChange={handleInputChange}
-                                            required
-                                            className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
-                                        />
-                                    </div>
-
-                                </div> {/* fechamento do grid*/}
-
-                                {/* Tipo do exame */}
-
+                        <form onSubmit={handleSubmit} className='space-y-4'>
+                            <div className='grid grid-cols-2 gap-4'>
                                 <div>
-                                    <label htmlFor='type' className='block text-sm font-medium mb-1'>
-                                        Tipo do exame
-                                    </label>
-
-                                    <textarea
-                                        name='type'
-                                        id='type'
-                                        value={formData.type}
-                                        rows={3}
-                                        onChange={handleInputChange}
-                                        required
-                                        className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none resize-none'
-                                    />
-                                </div>
-
-                                {/* Laboratótio */}
-
-                                <div>
-                                    <label htmlFor='laboratory' className='block text-sm font-medium mb-1'>
-                                        Laboratótio
-                                    </label>
-
+                                    <label htmlFor='data' className='block text-sm font-medium mb-1'>Data</label>
                                     <input
-                                        type='text'
-                                        name='laboratory'
-                                        id='laboratory'
-                                        value={formData.laboratory}
+                                        type='date'
+                                        name='data'
+                                        id='data'
+                                        value={formData.data}
                                         onChange={handleInputChange}
                                         required
                                         className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
                                     />
                                 </div>
-
-
-                                {/* URL do documento*/}
-
                                 <div>
-                                    <label
-                                        htmlFor="documentUrl"
-                                        className="block text-sm font-medium mb-1"
-                                    >
-                                        URL do documento
-                                    </label>
-
+                                    <label htmlFor='hora' className='block text-sm font-medium mb-1'>Horário</label>
                                     <input
-                                        type="file"
-                                        name="documentUrl"
-                                        id="documentUrl"
-                                        onChange={handleFileChange}
+                                        type='time'
+                                        name='hora'
+                                        id='hora'
+                                        value={formData.hora}
+                                        onChange={handleInputChange}
                                         required
-                                        accept=".pdf,.png,.jpg,.jpeg"
-                                        className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none"
+                                        className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
                                     />
                                 </div>
+                            </div>
 
+                            <div>
+                                <label htmlFor='tipo_exame' className='block text-sm font-medium mb-1'>
+                                    Tipo do exame
+                                </label>
+                                <input
+                                    type='text'
+                                    name='tipo_exame'
+                                    id='tipo_exame'
+                                    value={formData.tipo_exame}
+                                    onChange={handleInputChange}
+                                    required
+                                    className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
+                                />
+                            </div>
 
+                            <div>
+                                <label htmlFor='valor' className='block text-sm font-medium mb-1'>Valor (R$)</label>
+                                <input
+                                    type='number'
+                                    name='valor'
+                                    id='valor'
+                                    min="0"
+                                    step="0.01"
+                                    value={formData.valor}
+                                    onChange={handleInputChange}
+                                    required
+                                    className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
+                                />
+                            </div>
 
+                            <div>
+                                <label htmlFor='descricao' className='block text-sm font-medium mb-1'>
+                                    Descrição / Laboratório
+                                </label>
+                                <textarea
+                                    name='descricao'
+                                    id='descricao'
+                                    value={formData.descricao}
+                                    rows={3}
+                                    onChange={handleInputChange}
+                                    required
+                                    className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none resize-none'
+                                />
+                            </div>
 
-                                {/* botões */}
+                            <div>
+                                <label htmlFor='resultado' className='block text-sm font-medium mb-1'>Resultado</label>
+                                <textarea
+                                    name='resultado'
+                                    id='resultado'
+                                    value={formData.resultado}
+                                    rows={3}
+                                    onChange={handleInputChange}
+                                    required
+                                    className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none resize-none'
+                                />
+                            </div>
 
-                                <div className='flex justify-end gap-3 pt-4'>
-                                    <button
-                                        type='button'
-                                        onClick={handleCloseModal}
-                                        className='px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition'
-                                    >
-                                        Fechar
-                                    </button>
-
-
-                                    <button
-                                        type='submit'
-                                        disabled={isSaving}
-                                        className='px-4 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 transition'
-                                    >
-                                        {isSaving ? "Salvando..." : "Salvar"}
-                                    </button>
-
-
-                                </div>
-
-
-
-                            </form>
-                        </>
-                    )
-                }
+                            <div className='flex justify-end gap-3 pt-4'>
+                                <button
+                                    type='button'
+                                    onClick={handleCloseModal}
+                                    className='px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition'
+                                >
+                                    Fechar
+                                </button>
+                                <button
+                                    type='submit'
+                                    disabled={isSaving}
+                                    className='px-4 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 transition'
+                                >
+                                    {isSaving ? "Salvando..." : "Salvar"}
+                                </button>
+                            </div>
+                        </form>
+                    </>
+                )}
             </Modal>
-
         </section>
-
     )
 }
 

@@ -1,6 +1,8 @@
 import type { Exame, PrismaClient } from "../prisma/generated/prisma/client";
 import { prisma } from "../prisma/prisma";
 
+type ExameDados = Omit<Exame, "id">;
+
 export class ExamRepository {
     constructor(private readonly prisma: PrismaClient) {
         this.prisma = prisma
@@ -8,13 +10,13 @@ export class ExamRepository {
 
     async listarTodosExames(pagina?: number, limite?: number) {
         const existePaginacao = pagina! && limite!
-        if (!existePaginacao) return await prisma.exame.findMany()
-        const exames = await prisma.exame.findMany({
+        if (!existePaginacao) return await this.prisma.exame.findMany()
+        const exames = await this.prisma.exame.findMany({
             skip: (pagina - 1) * limite,
             take: limite
         })
 
-        const total = await prisma.exame.count();
+        const total = await this.prisma.exame.count();
         const totalPaginas = Math.ceil(total / limite)
         return {
             exames,
@@ -24,45 +26,42 @@ export class ExamRepository {
     }
 
     async buscarExameId(idExame: number) {
-        const exame = await prisma.exame.findUnique({
-            where: {
-                id: idExame
-            }
+        return await this.prisma.exame.findUnique({
+            where: { id: idExame }
         })
-        return exame;
     }
 
-    async criarExame(dadosExame: Exame) {
+    async criarExame(dadosExame: ExameDados) {
         return await this.prisma.exame.create({
             data: {
                 tipo_exame: dadosExame.tipo_exame,
                 valor: dadosExame.valor,
                 descricao: dadosExame.descricao,
-                data_exame: new Date(dadosExame.data_exame),
-                resultado: dadosExame.resultado
+                data_exame: dadosExame.data_exame,
+                resultado: dadosExame.resultado,
+                pacienteId: dadosExame.pacienteId,
             }
         })
     }
 
-    async atualizarExame(idExame: number, dadosParaAtualizar: Omit<Exame, 'id'>) {
-        const exameAtualizado = await prisma.exame.update({
+    async atualizarExame(idExame: number, dadosParaAtualizar: ExameDados) {
+        return await this.prisma.exame.update({
             data: {
-                ...dadosParaAtualizar
+                tipo_exame: dadosParaAtualizar.tipo_exame,
+                valor: dadosParaAtualizar.valor,
+                descricao: dadosParaAtualizar.descricao,
+                data_exame: dadosParaAtualizar.data_exame,
+                resultado: dadosParaAtualizar.resultado,
+                pacienteId: dadosParaAtualizar.pacienteId,
             },
-            where: {
-                id: idExame
-            }
+            where: { id: idExame }
         })
-
-        return exameAtualizado
     }
+
     async deletarExame(idExame: number) {
-        const exame = await prisma.exame.delete({
-            where: {
-                id: idExame
-            }
+        return await this.prisma.exame.delete({
+            where: { id: idExame }
         })
-        return exame;
     }
 }
 

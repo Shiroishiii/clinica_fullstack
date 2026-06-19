@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import { examService, type ExamService } from "../services/ExamService";
-import type { Exame } from "../prisma/generated/prisma/client";
 
 class ExamController {
     constructor(private readonly service: ExamService) {
@@ -23,8 +22,7 @@ class ExamController {
 
     async criarExame(req: Request, res: Response) {
         try {
-            const dadosExame = req.body as Exame
-            const exameCriado = await this.service.criarExame(dadosExame)
+            const exameCriado = await this.service.criarExame(req.body)
             return res.status(201).json(exameCriado)
         } catch (error) {
             console.log(error)
@@ -50,8 +48,7 @@ class ExamController {
     async atualizarExame(req: Request, res: Response) {
         try {
             const idExame = Number(req.params.id)
-            const dadosParaAtualizar = req.body as Exame
-            const exameAtualizado = await this.service.atualizarExame(idExame, dadosParaAtualizar)
+            const exameAtualizado = await this.service.atualizarExame(idExame, req.body)
             return res.status(200).json(exameAtualizado);
         } catch (error) {
             console.log(error)
@@ -61,13 +58,12 @@ class ExamController {
         }
     }
 
-
     async deletarExame(req: Request, res: Response) {
         try {
             const idExame = Number(req.params.id)
             const exame = await this.service.deletarExame(idExame)
             return res.status(200).json({
-                mensagem: "Usuário deletado com sucesso!",
+                mensagem: "Exame deletado com sucesso!",
                 data: exame
             });
         } catch (error) {
@@ -78,4 +74,5 @@ class ExamController {
         }
     }
 }
+
 export const examController = new ExamController(examService)

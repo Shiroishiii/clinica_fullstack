@@ -59,7 +59,13 @@ export class AuthService {
 
             return {
                 tokenAcesso,
-                tokenRefresh
+                tokenRefresh,
+                usuario: {
+                    id: existeUsuario.id,
+                    email: existeUsuario.email,
+                    nome: existeUsuario.nome,
+                    role: existeUsuario.role,
+                }
             }
         }
 

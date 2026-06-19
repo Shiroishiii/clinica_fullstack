@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import type { Paciente } from "../prisma/generated/prisma/client";
 import { pacienteService, type PacienteService } from "../services/PacienteService";
 
 class PacienteController {
@@ -23,8 +22,7 @@ class PacienteController {
 
     async criarPaciente(req: Request, res: Response) {
         try {
-            const dadosPaciente = req.body as Paciente
-            const pacienteCriado = await this.service.criarPaciente(dadosPaciente)
+            const pacienteCriado = await this.service.criarPaciente(req.body)
             return res.status(201).json(pacienteCriado)
         } catch (error) {
             console.log(error)
@@ -50,8 +48,7 @@ class PacienteController {
     async atualizarPaciente(req: Request, res: Response) {
         try {
             const idPaciente = Number(req.params.id)
-            const dadosParaAtualizar = req.body as Paciente
-            const pacienteAtualizado = await this.service.atualizarPaciente(idPaciente, dadosParaAtualizar)
+            const pacienteAtualizado = await this.service.atualizarPaciente(idPaciente, req.body)
             return res.status(200).json(pacienteAtualizado);
         } catch (error) {
             console.log(error)

@@ -3,15 +3,13 @@ import { useAuth } from "../../contexts/AuthContext"
 
 const PrivateRoute = ({ children }) => {
     const { user } = useAuth()
+    const token = localStorage.getItem("accessToken")
 
-    if (!user) {
+    if (!user || !token) {
         return <Navigate to="/" replace />
     }
 
-
-    return (
-        children
-    )
+    return children
 }
 
 export default PrivateRoute

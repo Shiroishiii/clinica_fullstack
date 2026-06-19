@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import type { Prontuario } from "../prisma/generated/prisma/client";
 import { prontuarioService, type ProntuarioService } from "../services/ProntuarioService";
 
 class ProntuarioController {
@@ -23,8 +22,7 @@ class ProntuarioController {
 
     async criarProntuario(req: Request, res: Response) {
         try {
-            const dadosProntuario = req.body as Prontuario
-            const prontuarioCriado = await this.service.criarProntuario(dadosProntuario)
+            const prontuarioCriado = await this.service.criarProntuario(req.body)
             return res.status(201).json(prontuarioCriado)
         } catch (error) {
             console.log(error)
@@ -50,8 +48,7 @@ class ProntuarioController {
     async atualizarProntuario(req: Request, res: Response) {
         try {
             const idProntuario = Number(req.params.id)
-            const dadosParaAtualizar = req.body as Prontuario
-            const prontuarioAtualizado = await this.service.atualizarProntuario(idProntuario, dadosParaAtualizar)
+            const prontuarioAtualizado = await this.service.atualizarProntuario(idProntuario, req.body)
             return res.status(200).json(prontuarioAtualizado);
         } catch (error) {
             console.log(error)

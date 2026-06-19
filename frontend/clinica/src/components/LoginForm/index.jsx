@@ -4,8 +4,6 @@ import { toast } from 'react-toastify'
 
 import { useNavigate } from 'react-router'
 
-import axios from 'axios'
-
 // Contexto
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -22,11 +20,7 @@ const LoginForm = () => {
 
     const { login, user } = useAuth()
 
-    // controle do modal
-
     const [isModalOpen, setIsModalOpen] = useState(false)
-
-    // autenticação do usuário (verificação)
 
     useEffect(() => {
         if (user) {
@@ -34,7 +28,6 @@ const LoginForm = () => {
         }
     }, [user, navigate])
 
-    //validação de login
     const handleLogin = async (e) => {
         e.preventDefault()
 
@@ -43,38 +36,24 @@ const LoginForm = () => {
                 email, senha: password
             })
 
-            console.log("response", response)
+            localStorage.setItem("accessToken", response.data.accessToken)
+            localStorage.setItem("refreshToken", response.data.refreshToken)
 
-            // console.log("params", params)
-
-            if (response.data.length === 0) {
-                toast.error('Usuário não encontrado. Verifique o email e senha', {
-                    autoClose: 3000,
-                    hideProgressBar: true
-                });
-                return;
-            }
-
-            localStorage.setItem("accessToken", response?.data?.accessToken)
-            localStorage.setItem("refreshToken", response?.data?.refreshToken)
-
-            login(email)
+            login(response.data.user)
 
             toast.success('Login realizado com sucesso!', {
                 autoClose: 2000
             })
 
-            setTimeout(() => navigate('/dashboard', 2000))
+            setTimeout(() => navigate('/dashboard'), 2000)
 
         } catch (error) {
             console.error('Erro ao verificar usuário', error)
-            toast.error('Erro ao conectar com o servidor', {
+            toast.error('Email ou senha inválidos', {
                 autoClose: 3000
             })
         }
     }
-
-
 
     return (
         <div className='max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg'>
@@ -98,7 +77,6 @@ const LoginForm = () => {
                     <input
                         type='password'
                         id='password'
-                        // minLength={8}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -127,10 +105,6 @@ const LoginForm = () => {
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <RegisterUser />
             </Modal>
-
-
-
-
         </div>
     )
 }

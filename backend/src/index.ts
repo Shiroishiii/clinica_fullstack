@@ -6,6 +6,7 @@
   import { exameRouter } from './routes/exame';
 import { PacienteRouter } from './routes/paciente';
 import { ConsultaRouter } from './routes/consulta';
+import { ProntuarioRouter } from './routes/prontuario';
 
   const app = express();
   app.use(express.json())
@@ -26,6 +27,7 @@ import { ConsultaRouter } from './routes/consulta';
   app.use(exameRouter)
   app.use(PacienteRouter)
   app.use(ConsultaRouter)
+  app.use(ProntuarioRouter)
 
   app.listen(port, () => {
     console.log("Servidor ta de pé :p")

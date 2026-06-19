@@ -1,42 +1,51 @@
 import type { Exame } from "../prisma/generated/prisma/client";
 import { examRepository, type ExamRepository } from "../repositories/ExamRepository";
 
+type ExameDados = Omit<Exame, "id">;
+
+function prepararDadosExame(dados: Record<string, unknown>): ExameDados {
+    let data_exame: Date;
+
+    if (dados.data && dados.hora) {
+        data_exame = new Date(`${dados.data}T${dados.hora}`);
+    } else {
+        data_exame = new Date(dados.data_exame as string);
+    }
+
+    return {
+        tipo_exame: dados.tipo_exame as string,
+        valor: dados.valor as Exame["valor"],
+        descricao: dados.descricao as string,
+        resultado: dados.resultado as string,
+        data_exame,
+        pacienteId: Number(dados.pacienteId),
+    };
+}
+
 export class ExamService {
-    constructor(private readonly repository: ExamRepository) { // TO-DO TIPAR SERVICE
+    constructor(private readonly repository: ExamRepository) {
     }
 
     async listarTodosExames(pagina?: number, limite?: number) {
-        const exames = await this.repository.listarTodosExames(pagina, limite)
-        return exames
+        return await this.repository.listarTodosExames(pagina, limite)
     }
 
-    async criarExame(dadosExame: Exame) {
-        const exameCriado = await this.repository.criarExame({
-            id: dadosExame.id,
-            tipo_exame: dadosExame.tipo_exame,
-            valor: dadosExame.valor,
-            descricao: dadosExame.descricao,
-            data_exame: new Date(dadosExame.data_exame),
-            resultado: dadosExame.resultado,
-            pacienteId: null
-        })
-        return exameCriado
+    async criarExame(dadosExame: Record<string, unknown>) {
+        const dados = prepararDadosExame(dadosExame);
+        return await this.repository.criarExame(dados);
     }
 
     async buscarExameId(idExame: number) {
-        const exame = await this.repository.buscarExameId(idExame);
-        return exame;
+        return await this.repository.buscarExameId(idExame);
     }
 
-    async atualizarExame(idExame: number, dadosParaAtualizar: Exame) {
-        const exameAtualizado = await this.repository.atualizarExame(idExame, dadosParaAtualizar)
-        return exameAtualizado;
+    async atualizarExame(idExame: number, dadosParaAtualizar: Record<string, unknown>) {
+        const dados = prepararDadosExame(dadosParaAtualizar);
+        return await this.repository.atualizarExame(idExame, dados);
     }
-
 
     async deletarExame(idExame: number) {
-        const exame = await this.repository.deletarExame(idExame);
-        return exame;
+        return await this.repository.deletarExame(idExame);
     }
 }
 

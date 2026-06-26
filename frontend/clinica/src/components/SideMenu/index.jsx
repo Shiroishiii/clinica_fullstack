@@ -119,6 +119,20 @@ const SideMenu = () => {
                     </li>
                     <li>
                         <NavLink
+                            to="/consultas-list"
+                            className={({ isActive }) =>
+                                `flex gap-2 hover:text-cyan-300 ${isActive ? "text-cyan-300" : "text-white"
+                                }`
+                            }
+                        >
+                            <MdMenu size={20} />
+                            {!isCollapsed && <span>Lista de Consultas</span>}
+                        </NavLink>
+
+
+                    </li>
+                    <li>
+                        <NavLink
                             to="/exames"
                             className={({ isActive }) =>
                                 `flex gap-2 hover:text-cyan-300 ${isActive ? "text-cyan-300" : "text-white"
@@ -127,6 +141,20 @@ const SideMenu = () => {
                         >
                             <FaListAlt size={20} />
                             {!isCollapsed && <span>Exames</span>}
+                        </NavLink>
+
+                    </li>
+
+                    <li>
+                        <NavLink
+                            to="/exames-list"
+                            className={({ isActive }) =>
+                                `flex gap-2 hover:text-cyan-300 ${isActive ? "text-cyan-300" : "text-white"
+                                }`
+                            }
+                        >
+                            <FaListAlt size={20} />
+                            {!isCollapsed && <span>Lista de exames</span>}
                         </NavLink>
 
                     </li>

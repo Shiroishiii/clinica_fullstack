@@ -13,11 +13,14 @@ function prepararDadosExame(dados: Record<string, unknown>): ExameDados {
     }
 
     return {
+        nome_exame: dados.nome_exame as string,
         tipo_exame: dados.tipo_exame as string,
+        laboratorio: dados.laboratorio as string,
         valor: dados.valor as Exame["valor"],
         descricao: dados.descricao as string,
         resultado: dados.resultado as string,
         data_exame,
+        documentURL: dados.documentURL as string,
         pacienteId: Number(dados.pacienteId),
     };
 }
@@ -30,7 +33,7 @@ export class ExamService {
         return await this.repository.listarTodosExames(pagina, limite)
     }
 
-    async criarExame(dadosExame: Record<string, unknown>) {
+    async criarExame(dadosExame: Record<string, unknown>) {     
         const dados = prepararDadosExame(dadosExame);
         return await this.repository.criarExame(dados);
     }

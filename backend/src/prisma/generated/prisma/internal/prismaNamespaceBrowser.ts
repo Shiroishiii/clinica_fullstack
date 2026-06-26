@@ -88,11 +88,14 @@ export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeo
 
 export const ExameScalarFieldEnum = {
   id: 'id',
+  nome_exame: 'nome_exame',
   tipo_exame: 'tipo_exame',
+  data_exame: 'data_exame',
+  laboratorio: 'laboratorio',
+  documentURL: 'documentURL',
+  resultado: 'resultado',
   valor: 'valor',
   descricao: 'descricao',
-  resultado: 'resultado',
-  data_exame: 'data_exame',
   pacienteId: 'pacienteId'
 } as const
 

@@ -66,6 +66,24 @@ function RegisterFormPatient() {
     yesterday.setDate(yesterday.getDate() - 1)
     const maxBirthDate = yesterday.toISOString().split("T")[0]
 
+
+
+
+    const validadeDate = () => {
+        const selectedDate = new Date(formData.data_nascimento)
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        if (selectedDate >= today) {
+            toast.error("A data de nascimento deve ser anterior à data atual.", {
+                autoClose: 2000,
+                hideProgressBar: true
+            })
+            return
+        }
+    }
+
     const resetForm = () => ({
         nome: "",
         sexo: "",
@@ -93,29 +111,55 @@ function RegisterFormPatient() {
     })
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        setIsSaving(true)
+        e.preventDefault();
+        setIsSaving(true);
 
         try {
-            await apiClient.post("/paciente", formData)
+            const selectedDate = new Date(formData.data_nascimento);
+
+            // Verifica se a data é válida
+            if (isNaN(selectedDate.getTime())) {
+                toast.error("Data de nascimento inválida.", {
+                    autoClose: 2000,
+                    hideProgressBar: true,
+                });
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            selectedDate.setHours(0, 0, 0, 0);
+
+            if (selectedDate >= today) {
+                toast.error("A data de nascimento deve ser anterior à data atual.", {
+                    autoClose: 2000,
+                    hideProgressBar: true,
+                });
+                return;
+            }
+
+            await apiClient.post("/paciente", formData);
 
             toast.success("Paciente cadastrado com sucesso!", {
                 autoClose: 2000,
-                hideProgressBar: true
-            })
+                hideProgressBar: true,
+            });
 
-            setFormData(resetForm())
+            setFormData(resetForm());
 
         } catch (error) {
-            console.error(error)
-            toast.error("Erro ao Salvar os dados!", {
+            console.error(error);
+
+            toast.error("Erro ao salvar os dados!", {
                 autoClose: 2000,
-                hideProgressBar: true
-            })
+                hideProgressBar: true,
+            });
+
         } finally {
-            setIsSaving(false)
+            setIsSaving(false);
         }
-    }
+    };
 
 
     return (
@@ -164,6 +208,7 @@ function RegisterFormPatient() {
                         id='data_nascimento'
                         value={formData.data_nascimento}
                         onChange={handleInputChange}
+                        onBlur={validadeDate}
                         max={maxBirthDate}
                         required
                         className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
@@ -417,7 +462,7 @@ function RegisterFormPatient() {
                         id='estado'
                         value={formData.estado}
                         onChange={handleInputChange}
-                        disabled="true"
+                        disabled={true}
                         className='w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none'
                     />
                 </fieldset>
